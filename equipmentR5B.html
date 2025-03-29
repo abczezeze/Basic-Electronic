@@ -12,16 +12,16 @@
 	<body>
         <script type="importmap">
 			{
-				"imports": {
-					"three": "/libs/three.module.js",
-					"three/addons/": "/libs/jsm/"
+			"imports": {
+				"three": "https://cdn.jsdelivr.net/npm/three@v0.175.0/build/three.module.js",
+				"three/addons/": "https://cdn.jsdelivr.net/npm/three@v0.175.0/examples/jsm/"
 				}
 			}
 		</script>
 		<script type="module">
-			import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/GLTFLoader.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
@@ -45,7 +45,7 @@ hemiLight.position.set( 0, 0, 0 );
 scene.add( hemiLight );
 
 const bodyRMaterial = new THREE.MeshStandardMaterial({
-    color:0xffff99,
+    color:0x5d8eb5,
     roughness:.2,
 });
 const row1Material = new THREE.MeshStandardMaterial({color:0x000000});
