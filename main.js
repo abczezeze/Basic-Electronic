@@ -3,8 +3,6 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-const targetPosition = new THREE.Vector3();
-let moving = false;
 //interavtive
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
@@ -19,6 +17,7 @@ const initialCameraPosition = new THREE.Vector3();
 initialCameraPosition.copy(camera.position);
 console.log(initialCameraPosition);
 
+
 const light1 = new THREE.DirectionalLight(0xffffff, 1);
 light1.position.set(3, 3, 3);
 scene.add(light1);
@@ -28,68 +27,34 @@ scene.add(light2);
 
 // Load models
 const Loader = new GLTFLoader();
-const [resistorLoad, diodeLoad, capacitorLoad, transistorLoad] = await Promise.all([
-    Loader.loadAsync('Models/resistor.glb'),
-    Loader.loadAsync('Models/diode.glb'),
-    Loader.loadAsync('Models/capacitorElectrolyzte.glb'),
-    Loader.loadAsync('Models/transistor.glb')
-]);
 
-const bodyRMaterial = new THREE.MeshStandardMaterial({
-    color:0xffff99,
-    roughness:.2,
-});
-const row1Material = new THREE.MeshStandardMaterial({color:0x000000});
-const row2Material = new THREE.MeshStandardMaterial({color:0xff0000});
-const row3Material = new THREE.MeshStandardMaterial({color:0x00ff00});
-const row4Material = new THREE.MeshStandardMaterial({color:0x0000ff});
-const row5Material = new THREE.MeshStandardMaterial({color:0xffd700});
-const silverMaterial = new THREE.MeshStandardMaterial({color:0xC0C0C0});
+const resistorLoad = await Loader.loadAsync('Models/resistor.glb');
 const resistor = resistorLoad.scene;
-resistor.children[0].traverse((child) => {
-    if (child.isMesh) {
-        child.material = bodyRMaterial;
-    }
-});
-resistor.children[1].traverse((child) => {
-    if (child.isMesh) {
-        child.material = row1Material;
-    }
-});
-resistor.children[2].traverse((child) => {
-    if (child.isMesh) {
-        child.material = row2Material;
-    }
-});
-resistor.children[3].traverse((child) => {
-    if (child.isMesh) {
-        child.material = row3Material;
-    }
-});
-resistor.children[4].traverse((child) => {
-    if (child.isMesh) {
-        child.material = row4Material;
-    }
-});
-resistor.children[5].traverse((child) => {
-    if (child.isMesh) {
-        child.material = row5Material;
-    }
-});
-resistor.children[6].traverse((child) => {
-    if (child.isMesh) {
-        child.material = silverMaterial;
-    }
-});
-resistor.scale.set(0.4,0.4,0.4);
-//console.log(resistor);
-const diodeNm = diodeLoad.scene;
-diodeNm.position.y = -0.7;
+scene.add(resistor);
+const resistorSbLoad = await Loader.loadAsync('Models/resistorSb.glb');
+const resistorSb = resistorSbLoad.scene;
+scene.add(resistorSb);
+const diodeLoad = await Loader.loadAsync('Models/diode.glb');
+const diode = diodeLoad.scene;
+scene.add(diode);
+const diodeSbLoad = await Loader.loadAsync('Models/diodeSb.glb');
+const diodeSb = diodeSbLoad.scene;
+scene.add(diodeSb);
+const capacitorLoad = await Loader.loadAsync('Models/capacitorElectrolyzte.glb');
 const cElectrolyzte = capacitorLoad.scene;
-cElectrolyzte.position.y = -1.5;
+scene.add(cElectrolyzte);
+const capacitorSbLoad = await Loader.loadAsync('Models/capacitorElectrolyzteSb.glb');
+const cElectrolyzteSb = capacitorSbLoad.scene;
+scene.add(cElectrolyzteSb);
+const transistorLoad = await Loader.loadAsync('Models/transistor.glb')
 const transistor = transistorLoad.scene;
-transistor.position.y = -2.2;
-scene.add(resistor, diodeNm, cElectrolyzte, transistor);
+scene.add(transistor);
+const transistorSbNPNLoad = await Loader.loadAsync('Models/transistorSbNPN.glb')
+const transistorSbNPN = transistorSbNPNLoad.scene;
+scene.add(transistorSbNPN);
+const transistorSbPNPLoad = await Loader.loadAsync('Models/transistorSbPNP.glb')
+const transistorSbPNP = transistorSbPNPLoad.scene;
+scene.add(transistorSbPNP);
 
 //rederer
 const renderer = new THREE.WebGLRenderer({antialias: true});
@@ -111,34 +76,60 @@ labelRenderer.domElement.style.pointerEvents = 'none';
 document.body.appendChild(labelRenderer.domElement);
 
 // สร้าง HTML Element
-const divr4b = document.createElement('div');
-divr4b.className = 'label';
-divr4b.textContent = '4';
-const divr5b = document.createElement('div');
-divr5b.className = 'label';
-divr5b.textContent = '5';
+const divR4B = document.createElement('div');
+divR4B.className = 'label';
+divR4B.textContent = 'ตัวต้านทาน 4 แถบ';
+const divR5B = document.createElement('div');
+divR5B.className = 'label';
+divR5B.textContent = 'ตัวต้านทาน 5 แถบ';
+const divDiode = document.createElement('div');
+divDiode.className = 'label';
+divDiode.textContent = 'ไดโอด';
+const divCapElec = document.createElement('div');
+divCapElec.className = 'label';
+divCapElec.textContent = 'ตัวเก็บประจุ';
+
+const divTstNPN = document.createElement('div');
+divTstNPN.className = 'label';
+divTstNPN.textContent = 'ทรานซิสเตอร์NPN';
+const divTstPNP = document.createElement('div');
+divTstPNP.className = 'label';
+divTstPNP.textContent = 'ทรานซิสเตอร์PNP';
 
 // ใส่ Event ให้ label
-divr4b.addEventListener('click', () => {
+divR4B.addEventListener('click', () => {
     window.open('./equipmentR4B.html' ,'_blank');
 });
-divr5b.addEventListener('click', () => {
+divR5B.addEventListener('click', () => {
     window.open('./equipmentR5B.html' ,'_blank');
 });
 
 // นำ div ไปใช้ใน Three.js
-const label4b = new CSS2DObject(divr4b);
-label4b.position.copy(resistor.position);
-label4b.position.set(0,.3,0);
-scene.add(label4b);
-const label5b = new CSS2DObject(divr5b);
-label5b.position.copy(resistor.position);
-label5b.position.set(.1,.3,0);
-scene.add(label5b);
+const labelR4B = new CSS2DObject(divR4B);
+labelR4B.position.y = 1.7;
+scene.add(labelR4B);
+const labelR5B = new CSS2DObject(divR5B);
+labelR5B.position.y = 1.4;
+scene.add(labelR5B);
+
+const labelDiode = new CSS2DObject(divDiode);
+labelDiode.position.y = .5;
+scene.add(labelDiode);
+
+const labelCapElec = new CSS2DObject(divCapElec);
+labelCapElec.position.y = -.5;
+scene.add(labelCapElec);
+
+const labelTstNPN = new CSS2DObject(divTstNPN);
+labelTstNPN.position.y = -1.5;
+scene.add(labelTstNPN);
+const labelTstPNP = new CSS2DObject(divTstPNP);
+labelTstPNP.position.y = -2.1;
+scene.add(labelTstPNP);
 
 //home button
 const homeButton = document.createElement('button');
-homeButton.innerHTML = 'Home';
+homeButton.innerHTML = 'เริ่มต้น';
 homeButton.style.position = 'absolute';
 homeButton.style.top = '20px'; // ห่างจากขอบบน
 homeButton.style.left = '50%'; // กึ่งกลางแนวนอน
@@ -156,8 +147,7 @@ homeButton.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)'; // เพิ่ม�
 // เพิ่ม effect เวลากด
 homeButton.addEventListener('mousedown', () => {
     homeButton.style.transform = 'translateX(-50%) scale(0.95)'; // กดแล้วหดนิดนึง
-    panToObject({ position: initialCameraPosition });
-    
+    camera.position.set(0,0,5);
 });
 homeButton.addEventListener('mouseup', () => {
     homeButton.style.transform = 'translateX(-50%) scale(1)'; // ปล่อยแล้วกลับมาเท่าเดิม
@@ -188,17 +178,16 @@ function onPointerDown( event ) {
         console.log(clickObj.object.name);
         switch (clickObj.object.name) {
             case "rstBody":
-                panToObject(resistor.children[0]);
+                moveObjectToCamera(resistor);
                 break;
             case "DiodeNm":
-                panToObject(diodeNm);
+                moveObjectToCamera(diode);
                 break;
             case "CElectrolyzte":
-                panToObject(cElectrolyzte);
+                moveObjectToCamera(cElectrolyzte);
                 break;
             case "Transistor":
-                console.log(transistor);
-                panToObject(transistor);
+                moveObjectToCamera(transistor);
                 break;
             default:
                 console.log('No action assigned for this object.');
@@ -206,23 +195,8 @@ function onPointerDown( event ) {
 	}
 }
 
-function panToObject(target) {
-    controls.enabled = false;
-    gsap.to(camera.position, {
-      x: target.position.x + 1,
-      y: target.position.y + 1,
-      z: target.position.z + 3,
-      duration: 1,
-      ease: "power2.inOut",
-      onUpdate: () => camera.lookAt(target.position),
-      onComplete: () => { controls.enabled = true; }
-    });
-  }
-
 function animate() {
     requestAnimationFrame(animate);
-
-
     controls.update();
     renderer.render(scene,camera);
     labelRenderer.render(scene, camera);
