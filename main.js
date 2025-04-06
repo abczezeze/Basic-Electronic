@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 //interavtive
 const raycaster = new THREE.Raycaster();
@@ -36,25 +37,42 @@ const resistorSb = resistorSbLoad.scene;
 scene.add(resistorSb);
 const diodeLoad = await Loader.loadAsync('Models/diode.glb');
 const diode = diodeLoad.scene;
+transparentOpacity(diode);
 scene.add(diode);
 const diodeSbLoad = await Loader.loadAsync('Models/diodeSb.glb');
 const diodeSb = diodeSbLoad.scene;
+transparentOpacity(diodeSb);
 scene.add(diodeSb);
 const capacitorLoad = await Loader.loadAsync('Models/capacitorElectrolyzte.glb');
 const cElectrolyzte = capacitorLoad.scene;
+transparentOpacity(cElectrolyzte);
 scene.add(cElectrolyzte);
 const capacitorSbLoad = await Loader.loadAsync('Models/capacitorElectrolyzteSb.glb');
 const cElectrolyzteSb = capacitorSbLoad.scene;
+transparentOpacity(cElectrolyzteSb);
 scene.add(cElectrolyzteSb);
 const transistorLoad = await Loader.loadAsync('Models/transistor.glb')
 const transistor = transistorLoad.scene;
+transparentOpacity(transistor);
 scene.add(transistor);
 const transistorSbNPNLoad = await Loader.loadAsync('Models/transistorSbNPN.glb')
 const transistorSbNPN = transistorSbNPNLoad.scene;
+transparentOpacity(transistorSbNPN);
 scene.add(transistorSbNPN);
 const transistorSbPNPLoad = await Loader.loadAsync('Models/transistorSbPNP.glb')
 const transistorSbPNP = transistorSbPNPLoad.scene;
+transparentOpacity(transistorSbPNP);
 scene.add(transistorSbPNP);
+
+//transrent function
+function transparentOpacity(object){
+    object.traverse((child) => {
+        if (child.isMesh) {  // ตรวจสอบว่าเป็น mesh
+            child.material.transparent = true;  // เปิดใช้งาน transparency
+            child.material.opacity = 0.3;      // ตั้งค่า opacity เป็น 0.3
+        }
+    });
+}
 
 //rederer
 const renderer = new THREE.WebGLRenderer({antialias: true});
@@ -76,19 +94,15 @@ labelRenderer.domElement.style.pointerEvents = 'none';
 document.body.appendChild(labelRenderer.domElement);
 
 // สร้าง HTML Element
-const divR4B = document.createElement('div');
-divR4B.className = 'label';
-divR4B.textContent = 'ตัวต้านทาน 4 แถบ';
-const divR5B = document.createElement('div');
-divR5B.className = 'label';
-divR5B.textContent = 'ตัวต้านทาน 5 แถบ';
+const divResistor = document.createElement('div');
+divResistor.className = 'label';
+divResistor.textContent = 'ตัวต้านทาน';
 const divDiode = document.createElement('div');
 divDiode.className = 'label';
 divDiode.textContent = 'ไดโอด';
 const divCapElec = document.createElement('div');
 divCapElec.className = 'label';
 divCapElec.textContent = 'ตัวเก็บประจุ';
-
 const divTstNPN = document.createElement('div');
 divTstNPN.className = 'label';
 divTstNPN.textContent = 'ทรานซิสเตอร์NPN';
@@ -96,30 +110,16 @@ const divTstPNP = document.createElement('div');
 divTstPNP.className = 'label';
 divTstPNP.textContent = 'ทรานซิสเตอร์PNP';
 
-// ใส่ Event ให้ label
-divR4B.addEventListener('click', () => {
-    window.open('./equipmentR4B.html' ,'_blank');
-});
-divR5B.addEventListener('click', () => {
-    window.open('./equipmentR5B.html' ,'_blank');
-});
-
 // นำ div ไปใช้ใน Three.js
-const labelR4B = new CSS2DObject(divR4B);
-labelR4B.position.y = 1.7;
-scene.add(labelR4B);
-const labelR5B = new CSS2DObject(divR5B);
-labelR5B.position.y = 1.4;
-scene.add(labelR5B);
-
+const labelResistor = new CSS2DObject(divResistor);
+labelResistor.position.y = 1.55;
+scene.add(labelResistor);
 const labelDiode = new CSS2DObject(divDiode);
 labelDiode.position.y = .5;
 scene.add(labelDiode);
-
 const labelCapElec = new CSS2DObject(divCapElec);
 labelCapElec.position.y = -.5;
 scene.add(labelCapElec);
-
 const labelTstNPN = new CSS2DObject(divTstNPN);
 labelTstNPN.position.y = -1.5;
 scene.add(labelTstNPN);
@@ -127,33 +127,36 @@ const labelTstPNP = new CSS2DObject(divTstPNP);
 labelTstPNP.position.y = -2.1;
 scene.add(labelTstPNP);
 
-//home button
-const homeButton = document.createElement('button');
-homeButton.innerHTML = 'เริ่มต้น';
-homeButton.style.position = 'absolute';
-homeButton.style.top = '20px'; // ห่างจากขอบบน
-homeButton.style.left = '50%'; // กึ่งกลางแนวนอน
-homeButton.style.transform = 'translateX(-50%)'; // จัดให้อยู่ตรงกลางจริง ๆ
-homeButton.style.fontSize = '20px';
-homeButton.style.color = 'white';
-homeButton.style.background = 'rgba(0, 0, 0, 0.7)';
-homeButton.style.padding = '10px 20px'; // ทำให้ดูเป็นปุ่ม
-homeButton.style.border = 'none'; // เอาขอบออก
-homeButton.style.borderRadius = '10px'; // ทำให้โค้งมน
-homeButton.style.cursor = 'pointer'; // ทำให้รู้ว่าคลิกได้
-homeButton.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.3)'; // เพิ่มเงาให้ดูมีมิติ
-
-//console.log(initialCameraPosition);
-// เพิ่ม effect เวลากด
-homeButton.addEventListener('mousedown', () => {
-    homeButton.style.transform = 'translateX(-50%) scale(0.95)'; // กดแล้วหดนิดนึง
-    camera.position.set(0,0,5);
-});
-homeButton.addEventListener('mouseup', () => {
-    homeButton.style.transform = 'translateX(-50%) scale(1)'; // ปล่อยแล้วกลับมาเท่าเดิม
+//sound
+let listener = new THREE.AudioListener();
+let bgm = new THREE.Audio( listener );
+let audioLoader = new THREE.AudioLoader();
+audioLoader.load('./sounds/basicElectronic.mp3', function( buffer ) {
+        bgm.setBuffer( buffer );
+        bgm.setLoop( true );
+        bgm.setVolume( 0.1 );
+        bgm.play();
 });
 
-document.body.appendChild(homeButton);
+//gui
+const params = {
+    bgm: 0.1,
+    r4b: function() {
+        window.open("./equipmentR4B.html", "_blank");
+    },
+    r5b: function() {
+        window.open("./equipmentR5B.html", "_blank");
+    }
+};
+
+const gui = new GUI();
+const volumeFolder = gui.title('เสียงประกอบ');
+volumeFolder.add( params, 'bgm' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+    bgm.setVolume( params.bgm );
+} );
+const linkFolder = gui.addFolder("ลิงก์");
+linkFolder.add(params,"r4b").name("ตัวต้าน่ทาน4แถบสี");
+linkFolder.add(params,"r5b").name("ตัวต้าน่ทาน5แถบสี");
 
 // Resize handler
 window.addEventListener('resize', onWindowResize);

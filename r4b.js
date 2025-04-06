@@ -4,6 +4,7 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { Line2 } from 'three/addons/lines/Line2.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
+import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
 //interavtive
 const raycaster = new THREE.Raycaster();
@@ -265,6 +266,68 @@ totalLb.style.left = '50vw';
 totalLb.style.textAlign = 'center';
 document.body.appendChild(totalLb);
 
+// สร้าง AudioListener และเพิ่มเข้าไปใน camera
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+// อาร์เรย์สำหรับเก็บไฟล์เสียง
+const sounds = [];
+const audioLoader = new THREE.AudioLoader();
+
+// โหลดไฟล์เสียง 3 ไฟล์
+const soundFiles = [
+    'sounds/sfx1.mp3',
+    'sounds/sfx2.mp3',
+    'sounds/sfx3.mp3'
+];
+
+// ฟังก์ชันโหลดไฟล์เสียง
+async function loadSounds() {
+    for (const file of soundFiles) {
+        const sound = new THREE.Audio(listener);
+        const audioBuffer = await audioLoader.loadAsync(file);
+        sound.setBuffer(audioBuffer);
+        sound.setVolume(0.8);
+        sounds.push(sound);
+    }
+}
+
+// เรียกฟังก์ชันโหลดเสียง
+loadSounds().then(() => console.log('Sounds loaded!'));
+
+//gui
+const params = {
+    sfx1: 0.8,
+    sfx2: 0.8,
+    sfx3: 0.8,
+    stop: false
+};
+
+const gui = new GUI();
+const volumeFolder = gui.title('ระดับเสียง');
+volumeFolder.add( params, 'sfx1' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+    sounds[0].setVolume( params.sfx1 );
+} );
+volumeFolder.add( params, 'sfx2' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+    sounds[1].setVolume( params.sfx2 );
+} );
+volumeFolder.add( params, 'sfx3' ).min( 0.0 ).max( 1.0 ).step( 0.01 ).onChange( function () {
+    sounds[2].setVolume( params.sfx3 );
+} );
+volumeFolder.add(params,'stop').onChange(()=>{
+    if(!params.stop)gui.domElement.style.opacity = '1';
+    else gui.domElement.style.opacity = '0.5';
+});
+
+// ฟังก์ชันสุ่มเล่นเสียง
+function playRandomSound() {
+    const randomIndex = Math.floor(Math.random() * sounds.length);
+    const sound = sounds[randomIndex];
+    if (sound.isPlaying) sound.stop();
+    if(!params.stop) sound.play();
+    else sound.stop();
+}
+
 //Calculate resitor value
 let f1=10,f2=2,f4=1000000;
 
@@ -297,70 +360,70 @@ function onPointerDown( event ) {
                 formula1.innerHTML = '9';
                 formula1.style.color = 'white';
                 f1=90;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c1":
                 resistor.children[4].material.color.set(0x808080);
                 formula1.innerHTML = '8';
                 formula1.style.color = 'grey';
                 f1=80;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c2":
                 resistor.children[4].material.color.set(0x800080);
                 formula1.innerHTML = '7';
                 formula1.style.color = 'violet';
                 f1=70;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c3":
                 resistor.children[4].material.color.set(0x0000FF);
                 formula1.innerHTML = '6';
                 formula1.style.color = 'blue';
                 f1=60;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c4":
                 resistor.children[4].material.color.set(0x00FF00);
                 formula1.innerHTML = '5';
                 formula1.style.color = 'green';
                 f1=50;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c5":
                 resistor.children[4].material.color.set(0xFFFF00);
                 formula1.innerHTML = '4';
                 formula1.style.color = 'yellow';
                 f1=40;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c6":
                 resistor.children[4].material.color.set(0xFFA500);
                 formula1.innerHTML = '3';
                 formula1.style.color = 'orange';
                 f1=30;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c7":
                 resistor.children[4].material.color.set(0xFF0000);
                 formula1.innerHTML = '2';
                 formula1.style.color = 'red';
                 f1=20;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c8":
                 resistor.children[4].material.color.set(0x8B4513);
                 formula1.innerHTML = '1';
                 formula1.style.color = 'brown';
                 f1=10;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r1c9":
                 resistor.children[4].material.color.set(0x0);
                 formula1.innerHTML = '0';
                 formula1.style.color = 'black';
                 f1=0;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             // 
             case "r2c0":
@@ -368,70 +431,70 @@ function onPointerDown( event ) {
                 formula2.innerHTML = '9';
                 formula2.style.color = 'white';
                 f2=9;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c1":
                 resistor.children[3].material.color.set(0x808080);
                 formula2.innerHTML = '8';
                 formula2.style.color = 'grey';
                 f2=8;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c2":
                 resistor.children[3].material.color.set(0x800080);
                 formula2.innerHTML = '7';
                 formula2.style.color = 'violet';
                 f2=7;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c3":
                 resistor.children[3].material.color.set(0x0000FF);
                 formula2.innerHTML = '6';
                 formula2.style.color = 'blue';
                 f2=6;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c4":
                 resistor.children[3].material.color.set(0x00FF00);
                 formula2.innerHTML = '5';
                 formula2.style.color = 'green';
                 f2=5;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c5":
                 resistor.children[3].material.color.set(0xFFFF00);
                 formula2.innerHTML = '4';
                 formula2.style.color = 'yellow';
                 f2=4;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c6":
                 resistor.children[3].material.color.set(0xFFA500);
                 formula2.innerHTML = '3';
                 formula2.style.color = 'orange';
                 f2=3;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c7":
                 resistor.children[3].material.color.set(0xFF0000);
                 formula2.innerHTML = '2';
                 formula2.style.color = 'red';
                 f2=2;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c8":
                 resistor.children[3].material.color.set(0x8B4513);
                 formula2.innerHTML = '1';
                 formula2.style.color = 'brown';
                 f2=1;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r2c9":
                 resistor.children[3].material.color.set(0x0);
                 formula2.innerHTML = '0';
                 formula2.style.color = 'black';
                 f2=0;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             //
             // case "r3c0":
@@ -439,70 +502,70 @@ function onPointerDown( event ) {
             //     formula3.innerHTML = '9';
             //     formula3.style.color = 'white';
             //     f3=9;
-            //     updateTotal();
+            //     updateTotal();playRandomSound();
             //     break;
             // case "r3c1":
             //     resistor.children[2].material.color.set(0x808080);
             //     formula3.innerHTML = '8';
             //     formula3.style.color = 'grey';
             //     f3=8;
-            //     updateTotal();
+            //     updateTotal();playRandomSound();
             //     break;
             // case "r3c2":
             //     resistor.children[2].material.color.set(0x800080);
             //     formula3.innerHTML = '7';
             //     formula3.style.color = 'violet';
             //     f3=7;
-            //     updateTotal(); 
+            //     updateTotal();playRandomSound(); 
             //     break;
             // case "r3c3":
             //     resistor.children[2].material.color.set(0x0000FF);
             //     formula3.innerHTML = '6';
             //     formula3.style.color = 'blue';
             //     f3=6;
-            //     updateTotal(); 
+            //     updateTotal();playRandomSound(); 
             //     break;
             // case "r3c4":
             //     resistor.children[2].material.color.set(0x00FF00);
             //     formula3.innerHTML = '5';
             //     formula3.style.color = 'green';
             //     f3=5;
-            //     updateTotal(); 
+            //     updateTotal();playRandomSound(); 
             //     break;
             // case "r3c5":
             //     resistor.children[2].material.color.set(0xFFFF00);
             //     formula3.innerHTML = '4';
             //     formula3.style.color = 'yellow';
             //     f3=4;
-            //     updateTotal();
+            //     updateTotal();playRandomSound();
             //     break;
             // case "r3c6":
             //     resistor.children[2].material.color.set(0xFFA500);
             //     formula3.innerHTML = '3';
             //     formula3.style.color = 'orange';
             //     f3=3;
-            //     updateTotal(); 
+            //     updateTotal();playRandomSound(); 
             //     break;
             // case "r3c7":
             //     resistor.children[2].material.color.set(0xFF0000);
             //     formula3.innerHTML = '2';
             //     formula3.style.color = 'red';
             //     f3=2;
-            //     updateTotal(); 
+            //     updateTotal();playRandomSound(); 
             //     break;
             // case "r3c8":
             //     resistor.children[2].material.color.set(0x8B4513);
             //     formula3.innerHTML = '1';
             //     formula3.style.color = 'brown';
             //     f3=1;
-            //     updateTotal();
+            //     updateTotal();playRandomSound();
             //     break;
             // case "r3c9":
             //     resistor.children[2].material.color.set(0x0);
             //     formula3.innerHTML = '0';
             //     formula3.style.color = 'black';
             //     f3=0;
-            //     updateTotal();
+            //     updateTotal();playRandomSound();
             //     break;
             //
             case "r4c0":
@@ -510,125 +573,133 @@ function onPointerDown( event ) {
                 formula4.innerHTML = 'x10&#8313;';
                 formula4.style.color = 'white';
                 f4=1000000000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c1":
                 resistor.children[2].material.color.set(0x808080);
                 formula4.innerHTML = 'x10&#8312;';
                 formula4.style.color = 'grey';
                 f4=100000000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c2":
                 resistor.children[2].material.color.set(0x800080);
                 formula4.innerHTML = 'x10&#8311;';
                 formula4.style.color = 'violet';
                 f4=10000000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c3":
                 resistor.children[2].material.color.set(0x0000FF);
                 formula4.innerHTML = 'x10&#8310;';
                 formula4.style.color = 'blue';
                 f4=1000000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c4":
                 resistor.children[2].material.color.set(0x00FF00);
                 formula4.innerHTML = 'x10&#8309;';
                 formula4.style.color = 'green';
                 f4=100000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c5":
                 resistor.children[2].material.color.set(0xFFFF00);
                 formula4.innerHTML = 'x10&#8308;';
                 formula4.style.color = 'yellow';
                 f4=10000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c6":
                 resistor.children[2].material.color.set(0xFFA500);
                 formula4.innerHTML = 'x10&#179;';
                 formula4.style.color = 'orange';
                 f4=1000;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c7":
                 resistor.children[2].material.color.set(0xFF0000);
                 formula4.innerHTML = 'x10&#178;';
                 formula4.style.color = 'red';
                 f4=100;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c8":
                 resistor.children[2].material.color.set(0x8B4513);
                 formula4.innerHTML = 'x10&#185;';
                 formula4.style.color = 'brown';
                 f4=10;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4c9":
                 resistor.children[2].material.color.set(0x0);
                 formula4.innerHTML = 'x1';
                 formula4.style.color = 'black';
                 f4=1;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4cA":
                 resistor.children[2].material.color.set(0xFFD700);
                 formula4.innerHTML = 'x0.1';
                 formula4.style.color = 'gold';
                 f4=0.1;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             case "r4cB":
                 resistor.children[2].material.color.set(0xC0C0C0);
                 formula4.innerHTML = 'x0.01';
                 formula4.style.color = 'silver';
                 f4=0.01;
-                updateTotal();
+                updateTotal();playRandomSound();
                 break;
             // 
             case "r5c0":
                 resistor.children[0].material.color.set(0xC0C0C0);
                 formula5.innerHTML = '&#177;10%';
                 formula5.style.color = 'silver';
+                playRandomSound();
                 break;
             case "r5c1":
                 resistor.children[0].material.color.set(0xFFD700);
                 formula5.innerHTML = '&#177;5%';
                 formula5.style.color = 'gold';
+                playRandomSound();
                 break;
             case "r5c2":
                 resistor.children[0].material.color.set(0x808080);
                 formula5.innerHTML = '&#177;0.05%';
                 formula5.style.color = 'grey';
+                playRandomSound();
                 break;
             case "r5c3":
                 resistor.children[0].material.color.set(0x800080);
                 formula5.innerHTML = '&#177;0.1%';
                 formula5.style.color = 'violet';
+                playRandomSound();
                 break;
             case "r5c4":
                 resistor.children[0].material.color.set(0x0000FF);
                 formula5.innerHTML = '&#177;0.25%';
                 formula5.style.color = 'blue';
+                playRandomSound();
                 break;
             case "r5c5":
                 resistor.children[0].material.color.set(0x00FF00);
                 formula5.innerHTML = '&#177;0.5%';
                 formula5.style.color = 'green';
+                playRandomSound();
                 break;
             case "r5c6":
                 resistor.children[0].material.color.set(0xFF0000);
                 formula5.innerHTML = '&#177;2%';
                 formula5.style.color = 'red';
+                playRandomSound();
                 break;
             case "r5c7":
                 resistor.children[0].material.color.set(0x8B4513);
                 formula5.innerHTML = '&#177;1%';
                 formula5.style.color = 'brown';
+                playRandomSound();
                 break;
             default:
                 console.log('No action assigned for this object.');
